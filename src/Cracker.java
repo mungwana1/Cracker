@@ -32,25 +32,29 @@ public class Cracker extends JDialog {
         super((Frame) null);
 
         setLayout(new BorderLayout());
-        JPanel line1 = new JPanel();
-        add(line1, BorderLayout.NORTH);
-        line1.setLayout(new FlowLayout(FlowLayout.LEFT));
-        line1.add(new JLabel("Number of letters"));
+        JPanel top = new JPanel(new BorderLayout());
+        add(top, BorderLayout.NORTH);
+        JPanel line1 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel line2 = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        top.add(line1, BorderLayout.NORTH);
+        line1.add(new JLabel("Missing letters match any character. Use !X for known incorrect matches."));
+        top.add(line2, BorderLayout.CENTER);
+        line2.add(new JLabel("Number of letters"));
         SpinnerNumberModel model = new SpinnerNumberModel(10, 1, 10, 1);
         nLetters = new JSpinner(model);
-        line1.add(nLetters);
+        line2.add(nLetters);
         nLetters.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
                 checkLetters();
             }
         });
-        line1.add(new JLabel("Letters: "));
+        line2.add(new JLabel("Letters: "));
 
         for(int i = 0; i < 10; i++) {
             Field text = new Field(2);
             fields.add(text);
-            line1.add(text);
+            line2.add(text);
         }
 
         JScrollPane sp = new JScrollPane(result, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
