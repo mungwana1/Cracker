@@ -1,6 +1,6 @@
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,10 +22,10 @@ public class Cracker extends JDialog {
     ArrayList<String> lines = new ArrayList<>();
     ArrayList<Field> fields = new ArrayList<>();
     JTextArea result = new JTextArea(40, 60);
-    JTextField nLetters = new JTextField(2);
+    JSpinner nLetters = new JSpinner();
     int letters = 10;
-    String x = "";
     boolean changing = false;
+    int x = 1;
     String fileName = "ignis-10M.txt";
 
     Cracker() {
@@ -36,21 +36,12 @@ public class Cracker extends JDialog {
         add(line1, BorderLayout.NORTH);
         line1.setLayout(new FlowLayout(FlowLayout.LEFT));
         line1.add(new JLabel("Number of letters"));
+        SpinnerNumberModel model = new SpinnerNumberModel(10, 1, 10, 1);
+        nLetters = new JSpinner(model);
         line1.add(nLetters);
-        nLetters.setText("10");
-        nLetters.getDocument().addDocumentListener(new DocumentListener() {
+        nLetters.addChangeListener(new ChangeListener() {
             @Override
-            public void insertUpdate(DocumentEvent e) {
-                checkLetters();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                checkLetters();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
+            public void stateChanged(ChangeEvent e) {
                 checkLetters();
             }
         });
@@ -110,9 +101,9 @@ public class Cracker extends JDialog {
     void checkLetters() {
         if(changing)
             return;
-        x = "";
+        x = 1;
         try {
-            int nl = Integer.parseInt(nLetters.getText());
+            int nl = (int) nLetters.getValue();
             if(nl > 0 && nl <= 10) {
                 letters = nl;
                 for(int i = 1; i < 10; i++) {
@@ -122,14 +113,14 @@ public class Cracker extends JDialog {
                         fields.get(i).setVisible(false);
                     }
                 }
-                x = "" + nl;
+                x = nl;
             }
         } catch (NumberFormatException ex) {
         }
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 changing = true;
-                nLetters.setText(x);
+                nLetters.setValue(x);
                 changing = false;
             }
         });
