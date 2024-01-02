@@ -4,6 +4,8 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -18,7 +20,7 @@ public class Cracker extends JDialog {
     }
 
     ArrayList<String> lines = new ArrayList<>();
-    ArrayList<JTextField> fields = new ArrayList<>();
+    ArrayList<Field> fields = new ArrayList<>();
     JTextArea result = new JTextArea(40, 60);
     JTextField nLetters = new JTextField(2);
     int letters = 10;
@@ -55,7 +57,7 @@ public class Cracker extends JDialog {
         line1.add(new JLabel("Letters: "));
 
         for(int i = 0; i < 10; i++) {
-            JTextField text = new JTextField(2);
+            Field text = new Field(2);
             fields.add(text);
             line1.add(text);
         }
@@ -165,5 +167,21 @@ public class Cracker extends JDialog {
         if(n == 0)
             result.append("No matches!");
         this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+    }
+
+    class Field extends JTextField {
+        Field(int columns) {
+            super(columns);
+            addKeyListener(new KeyAdapter() {
+
+                public void keyTyped(KeyEvent e) {
+                    char keyChar = e.getKeyChar();
+                    if (Character.isLowerCase(keyChar)) {
+                        e.setKeyChar(Character.toUpperCase(keyChar));
+                    }
+                }
+
+            });
+        }
     }
 }
