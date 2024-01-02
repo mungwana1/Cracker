@@ -179,7 +179,7 @@ public class Cracker extends JDialog {
                     if (Character.isLowerCase(keyChar)) {
                         e.setKeyChar(Character.toUpperCase(keyChar));
                     }
-                    if((keyChar != '!')) {
+                    if((keyChar != '!' && keyChar != KeyEvent.VK_DELETE && keyChar != KeyEvent.VK_BACK_SPACE)) {
                         KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
                         manager.focusNextComponent();
                     }}
