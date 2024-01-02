@@ -26,7 +26,7 @@ public class Cracker extends JDialog {
     int letters = 10;
     String x = "";
     boolean changing = false;
-    String fileName = "ignis-1M.txt";
+    String fileName = "ignis-10M.txt";
 
     Cracker() {
         super((Frame) null);
@@ -179,7 +179,10 @@ public class Cracker extends JDialog {
                     if (Character.isLowerCase(keyChar)) {
                         e.setKeyChar(Character.toUpperCase(keyChar));
                     }
-                }
+                    if((keyChar != '!')) {
+                        KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+                        manager.focusNextComponent();
+                    }}
 
             });
         }
