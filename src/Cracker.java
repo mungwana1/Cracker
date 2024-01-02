@@ -72,7 +72,7 @@ public class Cracker extends JDialog {
                     if(s.isEmpty())
                         sb.append('.');
                     else if(s.startsWith("!"))
-                        sb.append("[^" + s + "]");
+                        sb.append("[^" + s.substring(1, 2) + "]");
                     else
                         sb.append(s);
                     length++;
