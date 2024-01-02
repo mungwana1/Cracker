@@ -72,7 +72,7 @@ public class Cracker extends JDialog {
                     if(s.isEmpty())
                         sb.append('.');
                     else if(s.startsWith("!"))
-                        sb.append("[^" + s.substring(1, 2) + "]");
+                        sb.append("[^").append(s.substring(1, 2)).append("]");
                     else
                         sb.append(s);
                     length++;
@@ -107,15 +107,11 @@ public class Cracker extends JDialog {
             if(nl > 0 && nl <= 10) {
                 letters = nl;
                 for(int i = 1; i < 10; i++) {
-                    if (i < letters)
-                        fields.get(i).setVisible(true);
-                    else {
-                        fields.get(i).setVisible(false);
-                    }
+                    fields.get(i).setVisible(i < letters);
                 }
                 x = nl;
             }
-        } catch (NumberFormatException ex) {
+        } catch (NumberFormatException ignored) {
         }
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
@@ -160,7 +156,7 @@ public class Cracker extends JDialog {
         this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
     }
 
-    class Field extends JTextField {
+    static class Field extends JTextField {
         Field(int columns) {
             super(columns);
             addKeyListener(new KeyAdapter() {
