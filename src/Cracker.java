@@ -24,6 +24,7 @@ public class Cracker extends JDialog {
     int letters = 10;
     String x = "";
     boolean changing = false;
+    String fileName = "ignis-1M.txt";
 
     Cracker() {
         super((Frame) null);
@@ -59,7 +60,7 @@ public class Cracker extends JDialog {
             line1.add(text);
         }
 
-        JScrollPane sp = new JScrollPane(result);
+        JScrollPane sp = new JScrollPane(result, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         add(sp, BorderLayout.CENTER);
         JPanel buttons = new JPanel();
         add(buttons, BorderLayout.SOUTH);
@@ -70,6 +71,7 @@ public class Cracker extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 StringBuilder sb = new StringBuilder();
+                int length = 0;
                 for(JTextField f : fields) {
                     if(! f.isVisible())
                         continue;
@@ -80,9 +82,10 @@ public class Cracker extends JDialog {
                         sb.append("[^" + s + "]");
                     else
                         sb.append(s);
+                    length++;
                 }
                 Pattern pattern = Pattern.compile(sb.toString());
-                search(pattern);
+                search(pattern, length);
             }
         });
         JButton exit = new JButton("Exit");
@@ -99,8 +102,7 @@ public class Cracker extends JDialog {
         setLocation((screen.width - getWidth()) / 2, (screen.height - getHeight()) / 2);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
-        loadFile("ignis-10M.txt");
-//        loadFile("ignis-1M.txt");
+        loadFile(fileName);
     }
 
     void checkLetters() {
@@ -147,11 +149,13 @@ public class Cracker extends JDialog {
 
     }
 
-    void search(Pattern pattern) {
+    void search(Pattern pattern, int length) {
         this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
         int n = 0;
         result.setText("");
         for(String line : lines) {
+            if(line.length() != length)
+                continue;
             Matcher matcher = pattern.matcher(line);
             if(matcher.find()) {
                 result.append(line + System.lineSeparator());
