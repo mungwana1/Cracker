@@ -1,9 +1,5 @@
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.*;
@@ -18,10 +14,22 @@ public class Cracker extends JDialog {
         new Cracker().setVisible(true);
     }
 
+    /**
+     * the sorted password database
+     */
     TreeSet<String> lines = new TreeSet<>();
+    /**
+     * ten text fields
+     */
     ArrayList<Field> fields = new ArrayList<>();
+    /**
+     * the text area to display password matches
+     */
     JTextArea result = new JTextArea(40, 60);
-    JSpinner nLetters = new JSpinner();
+    /**
+     * a numeric spinner to select the number of letters
+     */
+    JSpinner nLetters;
     int letters = 10;
     boolean changing = false;
     int x = 1;
@@ -39,15 +47,10 @@ public class Cracker extends JDialog {
         line1.add(new JLabel("Missing letters match any character. Use !X for known incorrect matches."));
         top.add(line2, BorderLayout.CENTER);
         line2.add(new JLabel("Number of letters"));
-        SpinnerNumberModel model = new SpinnerNumberModel(10, 1, 10, 1);
+        SpinnerNumberModel model = new SpinnerNumberModel(10, 2, 10, 1);
         nLetters = new JSpinner(model);
         line2.add(nLetters);
-        nLetters.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                checkLetters();
-            }
-        });
+        nLetters.addChangeListener(e -> checkLetters());
         line2.add(new JLabel("Letters: "));
 
         for(int i = 0; i < 10; i++) {
@@ -56,6 +59,7 @@ public class Cracker extends JDialog {
             line2.add(text);
         }
 
+        result.setEditable(false);
         JScrollPane sp = new JScrollPane(result, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         add(sp, BorderLayout.CENTER);
         JPanel buttons = new JPanel();
@@ -63,35 +67,25 @@ public class Cracker extends JDialog {
         buttons.setLayout(new FlowLayout(FlowLayout.CENTER));
         JButton search = new JButton("Search");
         buttons.add(search);
-        search.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                StringBuilder sb = new StringBuilder();
-                int length = 0;
-                for(JTextField f : fields) {
-                    if(! f.isVisible())
-                        continue;
-                    String s = f.getText().trim().toUpperCase();
-                    if(s.isEmpty())
-                        sb.append('.');
-                    else if(s.startsWith("!"))
-                        sb.append("[^").append(s.substring(1, 2)).append("]");
-                    else
-                        sb.append(s);
-                    length++;
-                }
-                Pattern pattern = Pattern.compile(sb.toString());
-                search(pattern, length);
+        search.addActionListener(e -> {
+            StringBuilder sb = new StringBuilder();
+            for(JTextField f : fields) {
+                if(! f.isVisible())
+                    continue;
+                String s = f.getText().trim().toUpperCase();
+                if(s.isEmpty())
+                    sb.append('.');
+                else if(s.startsWith("!") && s.length() == 2)
+                    sb.append("[^").append(s.charAt(1)).append("]");
+                else
+                    sb.append(s);
             }
+            Pattern pattern = Pattern.compile(sb.toString());
+            search(pattern);
         });
         JButton exit = new JButton("Exit");
         buttons.add(exit);
-        exit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
-        });
+        exit.addActionListener(e -> dispose());
 
         pack();
         Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
@@ -121,12 +115,10 @@ public class Cracker extends JDialog {
             }
         } catch (NumberFormatException ignored) {
         }
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                changing = true;
-                nLetters.setValue(x);
-                changing = false;
-            }
+        SwingUtilities.invokeLater(() -> {
+            changing = true;
+            nLetters.setValue(x);
+            changing = false;
         });
    }
 
@@ -149,33 +141,16 @@ public class Cracker extends JDialog {
         }
     }
 
-    void addFile(String fileName) {
-        try {
-            File f = new File(fileName);
-            BufferedReader br = new BufferedReader(new FileReader(f));
-            while(true) {
-                String line = br.readLine();
-                if(line == null)
-                    break;
-                if(! lines.contains(line))
-                    lines.add(line.trim().toUpperCase());
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     /**
      * Searches the password database for matching entries
      * @param pattern the pattern to match
-     * @param length the pattern length
      */
-    void search(Pattern pattern, int length) {
+    void search(Pattern pattern) {
         this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
         int n = 0;
         result.setText("");
         for(String line : lines) {
-            if(line.length() != length)
+            if(line.length() != letters)
                 continue;
             Matcher matcher = pattern.matcher(line);
             if(matcher.find()) {
