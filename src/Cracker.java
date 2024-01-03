@@ -6,10 +6,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,14 +18,15 @@ public class Cracker extends JDialog {
         new Cracker().setVisible(true);
     }
 
-    ArrayList<String> lines = new ArrayList<>();
+    TreeSet<String> lines = new TreeSet<>();
     ArrayList<Field> fields = new ArrayList<>();
     JTextArea result = new JTextArea(40, 60);
     JSpinner nLetters = new JSpinner();
     int letters = 10;
     boolean changing = false;
     int x = 1;
-    String fileName = "ignis-10M.txt";
+    String fileName = "ignis-11M.txt";
+    String fileName1 = "ignis-10M.txt";
 
     Cracker() {
         super((Frame) null);
@@ -102,6 +102,10 @@ public class Cracker extends JDialog {
         loadFile(fileName);
     }
 
+    /**
+     * Called on a change to the number of letters field. Resets all letters to blank and displays
+     * only the requested number.
+     */
     void checkLetters() {
         if(changing)
             return;
@@ -127,6 +131,10 @@ public class Cracker extends JDialog {
         });
    }
 
+    /**
+     * Read in the password database file
+     * @param fileName the database text file
+     */
     void loadFile(String fileName) {
         try {
             File f = new File(fileName);
@@ -135,14 +143,34 @@ public class Cracker extends JDialog {
                 String line = br.readLine();
                 if(line == null)
                     break;
-                lines.add(line.toUpperCase());
+                lines.add(line.trim().toUpperCase());
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
     }
 
+    void addFile(String fileName) {
+        try {
+            File f = new File(fileName);
+            BufferedReader br = new BufferedReader(new FileReader(f));
+            while(true) {
+                String line = br.readLine();
+                if(line == null)
+                    break;
+                if(! lines.contains(line))
+                    lines.add(line.trim().toUpperCase());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Searches the password database for matching entries
+     * @param pattern the pattern to match
+     * @param length the pattern length
+     */
     void search(Pattern pattern, int length) {
         this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
         int n = 0;
