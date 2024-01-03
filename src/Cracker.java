@@ -26,7 +26,6 @@ public class Cracker extends JDialog {
     boolean changing = false;
     int x = 1;
     String fileName = "ignis-11M.txt";
-    String fileName1 = "ignis-10M.txt";
 
     Cracker() {
         super((Frame) null);
