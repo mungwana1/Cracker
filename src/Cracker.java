@@ -111,6 +111,7 @@ public class Cracker extends JDialog {
             if(nl > 0 && nl <= 10) {
                 letters = nl;
                 for(int i = 1; i < 10; i++) {
+                    fields.get(i).setText("");
                     fields.get(i).setVisible(i < letters);
                 }
                 x = nl;
